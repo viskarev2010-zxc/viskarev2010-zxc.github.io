@@ -1,0 +1,696 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Александр — сайты, Telegram-боты и парсеры</title>
+<meta name="description" content="Разработка сайтов, Telegram-ботов и парсеров на Python. Аккуратный код, понятные сроки, поддержка после сдачи. Открыт к заказам." />
+<meta name="theme-color" content="#08080d" />
+<meta property="og:type" content="website" />
+<meta property="og:title" content="Александр — сайты, Telegram-боты и парсеры" />
+<meta property="og:description" content="Разработка сайтов, Telegram-ботов и парсеров на Python. Аккуратный код, понятные сроки, поддержка после сдачи." />
+<meta property="og:image" content="https://avatars.githubusercontent.com/u/274414230?v=4" />
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Cdefs%3E%3ClinearGradient id='g' x1='0' y1='0' x2='1' y2='1'%3E%3Cstop offset='0' stop-color='%237c5cff'/%3E%3Cstop offset='1' stop-color='%2322d3ee'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='64' height='64' rx='16' fill='%230b0b12'/%3E%3Ctext x='32' y='43' font-family='Arial,sans-serif' font-size='30' font-weight='bold' text-anchor='middle' fill='url(%23g)'%3E%D0%90%3C/text%3E%3C/svg%3E" />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Manrope:wght@600;700;800&display=swap" rel="stylesheet" />
+<style>
+  :root{
+    --bg:#08080d;
+    --bg-soft:#0d0d15;
+    --text:#eceaf6;
+    --muted:#9b99b3;
+    --line:rgba(255,255,255,.09);
+    --card:rgba(255,255,255,.035);
+    --violet:#7c5cff;
+    --cyan:#22d3ee;
+    --grad:linear-gradient(120deg,#8b6bff 0%,#22d3ee 100%);
+    --radius:22px;
+    --max:1160px;
+  }
+  *,*::before,*::after{box-sizing:border-box}
+  html{scroll-behavior:smooth;-webkit-text-size-adjust:100%}
+  body{
+    margin:0;background:var(--bg);color:var(--text);
+    font-family:Inter,system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+    font-size:17px;line-height:1.65;letter-spacing:-.01em;
+    overflow-x:hidden;-webkit-font-smoothing:antialiased;
+  }
+  body::before{
+    content:"";position:fixed;inset:0;z-index:-2;pointer-events:none;
+    background:
+      radial-gradient(900px 600px at 78% -8%,rgba(124,92,255,.30),transparent 65%),
+      radial-gradient(700px 520px at 6% 12%,rgba(34,211,238,.14),transparent 62%),
+      radial-gradient(800px 600px at 50% 108%,rgba(124,92,255,.14),transparent 70%);
+  }
+  body::after{
+    content:"";position:fixed;inset:0;z-index:-1;pointer-events:none;opacity:.55;
+    background-image:linear-gradient(rgba(255,255,255,.035) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.035) 1px,transparent 1px);
+    background-size:72px 72px;
+    mask-image:radial-gradient(circle at 50% 0%,#000 0%,transparent 72%);
+    -webkit-mask-image:radial-gradient(circle at 50% 0%,#000 0%,transparent 72%);
+  }
+  img{max-width:100%;display:block}
+  a{color:inherit;text-decoration:none}
+  h1,h2,h3,h4{font-family:Manrope,Inter,sans-serif;line-height:1.12;letter-spacing:-.03em;margin:0;font-weight:800}
+  p{margin:0}
+  ::selection{background:rgba(124,92,255,.45);color:#fff}
+  :focus-visible{outline:2px solid var(--cyan);outline-offset:3px;border-radius:6px}
+  .wrap{width:100%;max-width:var(--max);margin:0 auto;padding:0 24px}
+  .grad{background:var(--grad);-webkit-background-clip:text;background-clip:text;color:transparent}
+
+  /* progress */
+  #progress{position:fixed;top:0;left:0;height:2px;width:0;z-index:100;background:var(--grad);box-shadow:0 0 14px rgba(124,92,255,.8)}
+
+  /* header */
+  header{position:fixed;top:0;left:0;right:0;z-index:90;transition:background .3s,border-color .3s,backdrop-filter .3s;border-bottom:1px solid transparent}
+  header.scrolled{background:rgba(8,8,13,.72);backdrop-filter:blur(16px) saturate(150%);border-bottom-color:var(--line)}
+  .nav{display:flex;align-items:center;justify-content:space-between;gap:18px;height:74px}
+  .brand{display:flex;align-items:center;gap:11px;font-family:Manrope,sans-serif;font-weight:800;letter-spacing:-.02em}
+  .brand-mark{
+    width:36px;height:36px;border-radius:11px;display:grid;place-items:center;
+    background:linear-gradient(140deg,rgba(124,92,255,.28),rgba(34,211,238,.18));
+    border:1px solid rgba(255,255,255,.14);font-size:17px;color:#fff;
+  }
+  .brand small{display:block;font-family:Inter,sans-serif;font-weight:500;font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);line-height:1;white-space:nowrap}
+  .nav-links{display:flex;align-items:center;gap:6px;list-style:none;margin:0;padding:0}
+  .nav-links a{padding:9px 13px;border-radius:10px;font-size:14.5px;color:#c9c7da;transition:color .2s,background .2s}
+  .nav-links a:hover{color:#fff;background:rgba(255,255,255,.06)}
+  .nav-cta{display:flex;align-items:center;gap:10px}
+  .btn{
+    display:inline-flex;align-items:center;justify-content:center;gap:9px;
+    padding:13px 22px;border-radius:999px;font-weight:600;font-size:15px;
+    border:1px solid transparent;cursor:pointer;transition:transform .18s,box-shadow .25s,background .2s,border-color .2s;
+    white-space:nowrap;
+  }
+  .btn svg{width:17px;height:17px;flex:none}
+  .btn-primary{background:var(--grad);color:#08080d;box-shadow:0 10px 30px -10px rgba(124,92,255,.9)}
+  .btn-primary:hover{transform:translateY(-2px);box-shadow:0 16px 40px -12px rgba(124,92,255,1)}
+  .btn-ghost{background:rgba(255,255,255,.05);border-color:var(--line);color:var(--text)}
+  .btn-ghost:hover{background:rgba(255,255,255,.09);transform:translateY(-2px)}
+  .btn-sm{padding:10px 18px;font-size:14px}
+  .burger{display:none;width:42px;height:42px;border-radius:12px;background:rgba(255,255,255,.05);border:1px solid var(--line);color:#fff;cursor:pointer;align-items:center;justify-content:center}
+  .burger span{display:block;width:17px;height:1.6px;background:#fff;border-radius:2px;position:relative;transition:.25s}
+  .burger span::before,.burger span::after{content:"";position:absolute;left:0;width:17px;height:1.6px;background:#fff;border-radius:2px;transition:.25s}
+  .burger span::before{top:-6px}.burger span::after{top:6px}
+  .burger.open span{background:transparent}
+  .burger.open span::before{top:0;transform:rotate(45deg)}
+  .burger.open span::after{top:0;transform:rotate(-45deg)}
+
+  /* hero */
+  .hero{position:relative;padding:150px 0 40px}
+  .hero-grid{display:grid;grid-template-columns:1.15fr .85fr;gap:56px;align-items:center}
+  .badge{
+    display:inline-flex;align-items:center;gap:9px;padding:7px 14px 7px 11px;border-radius:999px;
+    background:rgba(255,255,255,.04);border:1px solid var(--line);font-size:13px;color:#cfcde0;margin-bottom:26px;
+  }
+  .dot{width:7px;height:7px;border-radius:50%;background:#3ddc97;box-shadow:0 0 0 4px rgba(61,220,151,.14);animation:pulse 2.4s infinite}
+  @keyframes pulse{50%{box-shadow:0 0 0 8px rgba(61,220,151,0)}}
+  h1{font-size:clamp(2.45rem,4.2vw,3.25rem);letter-spacing:-.04em;text-wrap:balance}
+  .hero .lead{margin-top:22px;font-size:clamp(1.02rem,1.4vw,1.16rem);color:var(--muted);max-width:52ch}
+  .hero-actions{display:flex;flex-wrap:wrap;gap:12px;margin-top:34px}
+  .stats{display:flex;gap:40px;margin-top:46px;padding-top:26px;border-top:1px solid var(--line);flex-wrap:wrap}
+  .stat b{display:block;font-family:Manrope,sans-serif;font-size:1.6rem;letter-spacing:-.03em}
+  .stat span{font-size:12.5px;letter-spacing:.09em;text-transform:uppercase;color:#8a889f}
+
+  .portrait{position:relative;justify-self:end;width:100%;max-width:390px}
+  .portrait-card{
+    position:relative;border-radius:30px;overflow:hidden;aspect-ratio:1/1.12;
+    background:
+      radial-gradient(circle at 50% 38%,rgba(124,92,255,.34),transparent 62%),
+      linear-gradient(160deg,rgba(124,92,255,.18),rgba(34,211,238,.08) 55%,rgba(255,255,255,.02));
+    border:1px solid rgba(255,255,255,.13);
+    box-shadow:0 40px 90px -40px rgba(0,0,0,.9),inset 0 1px 0 rgba(255,255,255,.12);
+    display:grid;place-items:center;
+  }
+  .portrait-card::before{
+    content:"";position:absolute;inset:-1px;border-radius:inherit;padding:1px;
+    background:linear-gradient(150deg,rgba(255,255,255,.35),transparent 40%,rgba(34,211,238,.35));
+    -webkit-mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0);
+    -webkit-mask-composite:xor;mask-composite:exclude;pointer-events:none;
+  }
+  .orb{
+    position:absolute;width:250px;height:250px;border-radius:50%;top:34%;left:50%;transform:translate(-50%,-50%);
+    background:conic-gradient(from 180deg,rgba(124,92,255,.55),rgba(34,211,238,.45),rgba(124,92,255,.55));
+    filter:blur(34px);opacity:.55;
+  }
+  .mono-ring{
+    position:absolute;width:232px;height:232px;top:34%;left:50%;transform:translate(-50%,-50%);
+    border-radius:50%;border:1px dashed rgba(255,255,255,.22);
+  }
+  .mono-ring::after{
+    content:"";position:absolute;inset:26px;border-radius:50%;border:1px solid rgba(255,255,255,.10);
+  }
+  .monogram{
+    position:relative;font-family:Manrope,sans-serif;font-weight:800;font-size:7.5rem;line-height:1;
+    margin-top:-14%;background:linear-gradient(160deg,#fff 10%,#c9bcff 45%,#7fe6f7 95%);
+    -webkit-background-clip:text;background-clip:text;color:transparent;
+    filter:drop-shadow(0 12px 30px rgba(124,92,255,.45));
+  }
+  .code-tag{
+    position:absolute;top:52%;left:50%;transform:translateX(-50%);
+    font-family:ui-monospace,SFMono-Regular,Consolas,monospace;font-size:12px;letter-spacing:.16em;
+    color:#a9a6c4;padding:6px 12px;border-radius:8px;border:1px solid rgba(255,255,255,.12);
+    background:rgba(8,8,13,.45);backdrop-filter:blur(6px);white-space:nowrap;
+  }
+  .portrait::after{
+    content:"";position:absolute;inset:0;border-radius:30px;pointer-events:none;
+    background:linear-gradient(to top,rgba(8,8,13,.9) 0%,rgba(8,8,13,.05) 45%,transparent 70%);
+  }
+  .portrait-meta{position:absolute;left:0;right:0;bottom:0;padding:26px;z-index:2}
+  .portrait-meta b{display:block;font-family:Manrope,sans-serif;font-size:1.25rem}
+  .portrait-meta span{font-size:13.5px;color:#b3b1c6}
+  .float-chip{
+    position:absolute;z-index:3;padding:9px 14px;border-radius:12px;font-size:13px;font-weight:600;
+    background:rgba(16,16,24,.82);border:1px solid rgba(255,255,255,.13);backdrop-filter:blur(10px);
+    box-shadow:0 16px 30px -16px rgba(0,0,0,.9);display:flex;align-items:center;gap:8px;
+  }
+  .float-chip i{width:6px;height:6px;border-radius:50%;background:var(--cyan);display:block}
+  .chip-1{top:8%;left:-26px;animation:float 7s ease-in-out infinite}
+  .chip-2{top:38%;right:-30px;animation:float 8.5s ease-in-out infinite reverse}
+  .chip-3{bottom:24%;left:-34px;animation:float 9.5s ease-in-out infinite}
+  .chip-1 i{background:#f7df1e}.chip-2 i{background:#3776ab}.chip-3 i{background:#3ddc97}
+  @keyframes float{50%{transform:translateY(-13px)}}
+
+  /* marquee */
+  .marquee{margin-top:64px;border-top:1px solid var(--line);border-bottom:1px solid var(--line);overflow:hidden;padding:16px 0;position:relative}
+  .marquee::before,.marquee::after{content:"";position:absolute;top:0;bottom:0;width:110px;z-index:2;pointer-events:none}
+  .marquee::before{left:0;background:linear-gradient(90deg,var(--bg),transparent)}
+  .marquee::after{right:0;background:linear-gradient(270deg,var(--bg),transparent)}
+  .marquee-track{display:flex;gap:44px;width:max-content;animation:slide 34s linear infinite}
+  .marquee:hover .marquee-track{animation-play-state:paused}
+  .marquee-track span{font-size:13px;letter-spacing:.16em;text-transform:uppercase;color:#8d8ba3;white-space:nowrap;display:flex;align-items:center;gap:44px}
+  .marquee-track span::after{content:"";width:4px;height:4px;border-radius:50%;background:rgba(255,255,255,.25)}
+  @keyframes slide{to{transform:translateX(-50%)}}
+
+  /* sections */
+  section{position:relative}
+  .section{padding:110px 0}
+  .eyebrow{display:inline-flex;align-items:center;gap:10px;font-size:12px;letter-spacing:.2em;text-transform:uppercase;color:#a99cff;font-weight:600;margin-bottom:18px}
+  .eyebrow::before{content:"";width:26px;height:1px;background:linear-gradient(90deg,var(--violet),transparent)}
+  .sec-head{max-width:660px;margin-bottom:54px}
+  .sec-head h2{font-size:clamp(1.9rem,3.4vw,2.7rem)}
+  .sec-head p{margin-top:16px;color:var(--muted);font-size:1.03rem}
+  .sec-head.row{display:flex;align-items:flex-end;justify-content:space-between;gap:30px;max-width:none}
+
+  /* cards */
+  .grid{display:grid;gap:18px}
+  .g2{grid-template-columns:repeat(2,1fr)}
+  .g3{grid-template-columns:repeat(3,1fr)}
+  .card{
+    position:relative;background:var(--card);border:1px solid var(--line);border-radius:var(--radius);
+    padding:30px;overflow:hidden;transition:transform .25s,border-color .25s,background .25s;
+  }
+  .card::after{
+    content:"";position:absolute;inset:0;pointer-events:none;opacity:0;transition:opacity .3s;
+    background:radial-gradient(420px circle at var(--mx,50%) var(--my,50%),rgba(124,92,255,.16),transparent 62%);
+  }
+  .card:hover{transform:translateY(-4px);border-color:rgba(255,255,255,.18);background:rgba(255,255,255,.055)}
+  .card:hover::after{opacity:1}
+  .ico{
+    width:48px;height:48px;border-radius:14px;display:grid;place-items:center;margin-bottom:20px;
+    background:linear-gradient(150deg,rgba(124,92,255,.24),rgba(34,211,238,.12));
+    border:1px solid rgba(255,255,255,.12);color:#cfc8ff;
+  }
+  .ico svg{width:22px;height:22px}
+  .card h3{font-size:1.19rem;margin-bottom:10px;letter-spacing:-.02em}
+  .card p{color:var(--muted);font-size:15px}
+  .card ul{margin:16px 0 0;padding:0;list-style:none;display:grid;gap:8px}
+  .card ul li{font-size:14px;color:#b9b7ca;padding-left:20px;position:relative}
+  .card ul li::before{content:"";position:absolute;left:2px;top:.62em;width:7px;height:7px;border-radius:2px;background:var(--grad);opacity:.85}
+
+  /* projects */
+  .project{display:flex;flex-direction:column;gap:14px;min-height:250px}
+  .project-top{display:flex;align-items:center;justify-content:space-between;gap:12px}
+  .project-ico{width:40px;height:40px;border-radius:12px;display:grid;place-items:center;border:1px solid rgba(255,255,255,.12);background:rgba(255,255,255,.05);color:#bfb7ff}
+  .project-ico svg{width:19px;height:19px}
+  .arrow{width:34px;height:34px;border-radius:50%;display:grid;place-items:center;border:1px solid var(--line);color:#b9b7ca;transition:.25s}
+  .arrow svg{width:15px;height:15px;transition:transform .25s}
+  .project:hover .arrow{background:var(--grad);color:#08080d;border-color:transparent}
+  .project:hover .arrow svg{transform:translate(2px,-2px)}
+  .project h3{font-size:1.08rem}
+  .project p{font-size:14.5px;flex:1}
+  .tags{display:flex;flex-wrap:wrap;gap:7px}
+  .tag{font-size:11.5px;letter-spacing:.04em;padding:5px 10px;border-radius:999px;background:rgba(255,255,255,.05);border:1px solid var(--line);color:#b6b4c9}
+  .tag.p{color:#a5b4fc;border-color:rgba(124,92,255,.35);background:rgba(124,92,255,.10)}
+  .tag.j{color:#fde68a;border-color:rgba(247,223,30,.25);background:rgba(247,223,30,.07)}
+
+  /* stack */
+  .stack{display:flex;flex-wrap:wrap;gap:10px;margin-top:26px}
+  .stack span{padding:9px 15px;border-radius:11px;font-size:13.5px;color:#c8c6d8;background:rgba(255,255,255,.04);border:1px solid var(--line);transition:.2s}
+  .stack span:hover{color:#fff;border-color:rgba(124,92,255,.5);background:rgba(124,92,255,.10);transform:translateY(-2px)}
+
+  /* about */
+  .about{display:grid;grid-template-columns:.95fr 1.05fr;gap:64px;align-items:start}
+  .about p+p{margin-top:16px}
+  .about p{color:var(--muted)}
+  .principles{display:grid;gap:14px;margin-top:6px}
+  .principle{display:flex;gap:16px;padding:20px 22px;border-radius:16px;background:var(--card);border:1px solid var(--line);transition:.25s}
+  .principle:hover{border-color:rgba(255,255,255,.18);background:rgba(255,255,255,.055)}
+  .principle b{display:block;font-size:15px;margin-bottom:3px;font-weight:600;color:#f0eefb}
+  .principle span{font-size:14px;color:var(--muted)}
+  .num{font-family:Manrope,sans-serif;font-size:13px;font-weight:800;color:#8b6bff;padding-top:2px;min-width:22px}
+
+  /* process */
+  .steps{display:grid;grid-template-columns:repeat(4,1fr);gap:18px;counter-reset:s}
+  .step{position:relative;padding:28px 24px;border-radius:18px;border:1px solid var(--line);background:var(--card)}
+  .step::before{
+    counter-increment:s;content:"0" counter(s);
+    font-family:Manrope,sans-serif;font-weight:800;font-size:13px;letter-spacing:.1em;
+    color:#0a0a11;background:var(--grad);border-radius:8px;padding:4px 9px;display:inline-block;margin-bottom:16px;
+  }
+  .step h3{font-size:1rem;margin-bottom:8px}
+  .step p{font-size:14px;color:var(--muted)}
+
+  /* cta */
+  .cta{
+    position:relative;border-radius:32px;overflow:hidden;padding:64px 56px;
+    border:1px solid rgba(255,255,255,.14);
+    background:linear-gradient(130deg,rgba(124,92,255,.22),rgba(34,211,238,.12) 60%,rgba(255,255,255,.03));
+    display:grid;grid-template-columns:1.25fr .75fr;gap:40px;align-items:center;
+  }
+  .cta::before{
+    content:"";position:absolute;width:520px;height:520px;right:-120px;top:-220px;border-radius:50%;
+    background:radial-gradient(circle,rgba(34,211,238,.35),transparent 65%);filter:blur(20px);pointer-events:none;
+  }
+  .cta h2{font-size:clamp(1.8rem,3.2vw,2.5rem);max-width:22ch}
+  .cta p{margin-top:14px;color:#c4c2d6;max-width:44ch}
+  .cta-actions{display:flex;flex-direction:column;gap:12px;align-items:stretch;position:relative;z-index:1}
+  .cta-actions .btn{width:100%;padding:16px 24px}
+  .cta-note{font-size:12.5px;color:#a8a6bd;text-align:center;margin-top:4px}
+
+  /* contacts */
+  .contact-card{display:flex;align-items:center;gap:16px;padding:22px 24px}
+  .contact-card .ico{margin:0;width:44px;height:44px;border-radius:13px}
+  .contact-card b{display:block;font-size:15px;font-weight:600}
+  .contact-card span{font-size:13.5px;color:var(--muted)}
+  .contact-card .arrow{margin-left:auto;flex:none}
+
+  /* footer */
+  footer{border-top:1px solid var(--line);padding:36px 0 44px;margin-top:20px}
+  .foot{display:flex;align-items:center;justify-content:space-between;gap:20px;flex-wrap:wrap;font-size:13.5px;color:#8a889f}
+  .foot a:hover{color:#fff}
+  .foot-links{display:flex;gap:20px;flex-wrap:wrap}
+
+  /* reveal */
+  .reveal{opacity:0;transform:translateY(22px);transition:opacity .7s cubic-bezier(.2,.7,.2,1),transform .7s cubic-bezier(.2,.7,.2,1)}
+  .reveal.in{opacity:1;transform:none}
+  .reveal.d1{transition-delay:.07s}.reveal.d2{transition-delay:.14s}.reveal.d3{transition-delay:.21s}.reveal.d4{transition-delay:.28s}
+
+  @media (max-width:980px){
+    .hero{padding-top:130px}
+    .hero-grid{grid-template-columns:1fr;gap:44px}
+    .portrait{justify-self:start;max-width:330px;order:-1}
+    .about{grid-template-columns:1fr;gap:38px}
+    .g3{grid-template-columns:repeat(2,1fr)}
+    .steps{grid-template-columns:repeat(2,1fr)}
+    .cta{grid-template-columns:1fr;padding:44px 34px}
+    .nav-links{display:none}
+    .burger{display:flex}
+    .nav-cta .btn-ghost{display:none}
+    .nav-links.open{
+      display:flex;position:absolute;top:74px;left:16px;right:16px;flex-direction:column;align-items:stretch;gap:4px;
+      background:rgba(13,13,21,.97);border:1px solid var(--line);border-radius:18px;padding:12px;
+      backdrop-filter:blur(18px);box-shadow:0 30px 60px -30px #000;
+    }
+    .nav-links.open a{padding:13px 14px;font-size:16px}
+  }
+  @media (max-width:640px){
+    body{font-size:16px}
+    .wrap{padding:0 18px}
+    .section{padding:74px 0}
+    .hero{padding-top:112px}
+    .stats{gap:26px}
+    .g2,.g3,.steps{grid-template-columns:1fr}
+    .card{padding:24px}
+    .float-chip{display:none}
+    .sec-head.row{flex-direction:column;align-items:flex-start}
+    .cta{padding:34px 24px;border-radius:24px}
+    .cta-actions .btn{padding:14px 20px}
+    .foot{flex-direction:column;align-items:flex-start}
+    .marquee{margin-top:44px}
+  }
+  @media (prefers-reduced-motion:reduce){
+    *,*::before,*::after{animation:none!important;transition:none!important}
+    html{scroll-behavior:auto}
+    .reveal{opacity:1;transform:none}
+  }
+</style>
+<noscript><style>.reveal{opacity:1;transform:none}</style></noscript>
+</head>
+<body>
+<div id="progress" aria-hidden="true"></div>
+
+<header id="header">
+  <div class="wrap nav">
+    <a class="brand" href="#top" aria-label="Александр — на главную">
+      <span class="brand-mark">А</span>
+      <span>Александр<small>web &amp; python</small></span>
+    </a>
+    <nav>
+      <ul class="nav-links" id="navLinks">
+        <li><a href="#services">Услуги</a></li>
+        <li><a href="#projects">Проекты</a></li>
+        <li><a href="#about">Обо мне</a></li>
+        <li><a href="#process">Как работаю</a></li>
+        <li><a href="#contacts">Контакты</a></li>
+      </ul>
+    </nav>
+    <div class="nav-cta">
+      <a class="btn btn-ghost btn-sm" href="https://kwork.ru/user/visk1111" target="_blank" rel="noopener">Kwork</a>
+      <a class="btn btn-primary btn-sm" href="https://t.me/haunted8" target="_blank" rel="noopener">
+        <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M21.9 4.3 18.9 19c-.2 1-.8 1.3-1.7.8l-4.6-3.4-2.2 2.1c-.2.2-.4.4-.9.4l.3-4.6 8.4-7.6c.4-.3-.1-.5-.6-.2L7.2 13.1l-4.5-1.4c-1-.3-1-1 .2-1.5L20.5 2.9c.8-.3 1.6.2 1.4 1.4Z"/></svg>
+        Написать
+      </a>
+      <button class="burger" id="burger" aria-label="Меню" aria-expanded="false"><span></span></button>
+    </div>
+  </div>
+</header>
+
+<main id="top">
+  <section class="hero">
+    <div class="wrap">
+      <div class="hero-grid">
+        <div>
+          <div class="badge reveal"><span class="dot"></span> Открыт к новым проектам</div>
+          <h1 class="reveal d1">Сайты, Telegram&#8209;боты<br>и <span class="grad">автоматизация</span></h1>
+          <p class="lead reveal d2">
+            Меня зовут Александр. Делаю лендинги, Telegram-ботов и парсеры на Python —
+            под задачу бизнеса, с понятными сроками и поддержкой после сдачи.
+          </p>
+          <div class="hero-actions reveal d3">
+            <a class="btn btn-primary" href="https://t.me/haunted8" target="_blank" rel="noopener">
+              <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M21.9 4.3 18.9 19c-.2 1-.8 1.3-1.7.8l-4.6-3.4-2.2 2.1c-.2.2-.4.4-.9.4l.3-4.6 8.4-7.6c.4-.3-.1-.5-.6-.2L7.2 13.1l-4.5-1.4c-1-.3-1-1 .2-1.5L20.5 2.9c.8-.3 1.6.2 1.4 1.4Z"/></svg>
+              Обсудить проект
+            </a>
+            <a class="btn btn-ghost" href="#projects">Смотреть работы</a>
+          </div>
+          <div class="stats reveal d4">
+            <div class="stat"><b>5</b><span>проектов в портфолио</span></div>
+            <div class="stat"><b>2</b><span>направления</span></div>
+            <div class="stat"><b>&lt; 24 ч</b><span>отвечаю на сообщения</span></div>
+          </div>
+        </div>
+
+        <div class="portrait reveal d2">
+          <div class="portrait-card">
+            <div class="orb" aria-hidden="true"></div>
+            <div class="mono-ring" aria-hidden="true"></div>
+            <span class="monogram" aria-hidden="true">А</span>
+            <span class="code-tag" aria-hidden="true">&lt;/&gt; web &amp; python</span>
+          </div>
+          <div class="float-chip chip-1"><i></i> JavaScript</div>
+          <div class="float-chip chip-2"><i></i> Python</div>
+          <div class="float-chip chip-3"><i></i> на связи</div>
+          <div class="portrait-meta">
+            <b>Александр</b>
+            <span>Web-разработчик · Python-разработчик</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="marquee" aria-hidden="true">
+      <div class="marquee-track">
+        <span>HTML5</span><span>CSS3</span><span>JavaScript</span><span>Python</span><span>aiogram</span><span>Telegram Bot API</span><span>Парсинг данных</span><span>Адаптивная вёрстка</span><span>Git</span><span>REST API</span>
+        <span>HTML5</span><span>CSS3</span><span>JavaScript</span><span>Python</span><span>aiogram</span><span>Telegram Bot API</span><span>Парсинг данных</span><span>Адаптивная вёрстка</span><span>Git</span><span>REST API</span>
+      </div>
+    </div>
+  </section>
+
+  <section class="section" id="services">
+    <div class="wrap">
+      <div class="sec-head reveal">
+        <div class="eyebrow">Услуги</div>
+        <h2>Что я могу сделать для вас</h2>
+        <p>Беру задачи целиком — от идеи и структуры до запуска. Или подключаюсь к готовому проекту, если нужно доработать и починить.</p>
+      </div>
+      <div class="grid g2">
+        <article class="card reveal">
+          <div class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="2" y="3" width="20" height="14" rx="2.5"/><path d="M8 21h8M12 17v4"/></svg></div>
+          <h3>Лендинги и сайты-визитки</h3>
+          <p>Продающая одностраничная страница или небольшой сайт: чистый код, быстрая загрузка, аккуратная анимация.</p>
+          <ul>
+            <li>Адаптив под телефон, планшет и ПК</li>
+            <li>Вёрстка по макету или с нуля по вашей идее</li>
+            <li>Формы заявок, кнопки мессенджеров, подключение аналитики</li>
+          </ul>
+        </article>
+        <article class="card reveal d1">
+          <div class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m21.5 3.5-9 17-3.2-7.3L2 10.2l19.5-6.7Z"/><path d="m9.3 13.2 4.2-4.2"/></svg></div>
+          <h3>Telegram-боты на Python</h3>
+          <p>Боты для заявок, учёта, уведомлений и внутренних процессов. С админ-панелью и понятной инструкцией по запуску.</p>
+          <ul>
+            <li>Приём заявок и пересылка менеджеру</li>
+            <li>Учёт расходов, статистика, отчёты</li>
+            <li>Хранение данных в SQLite / PostgreSQL</li>
+          </ul>
+        </article>
+        <article class="card reveal d2">
+          <div class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><ellipse cx="12" cy="5" rx="8.5" ry="3.2"/><path d="M3.5 5v7c0 1.8 3.8 3.2 8.5 3.2s8.5-1.4 8.5-3.2V5"/><path d="M3.5 12v7c0 1.8 3.8 3.2 8.5 3.2s8.5-1.4 8.5-3.2v-7"/></svg></div>
+          <h3>Парсинг и автоматизация</h3>
+          <p>Собираю данные с сайтов и превращаю рутину в скрипт: цены, товары, объявления, отчёты по расписанию.</p>
+          <ul>
+            <li>Мониторинг цен конкурентов</li>
+            <li>Выгрузка в Excel, CSV или Google Sheets</li>
+            <li>Запуск по расписанию и уведомления в Telegram</li>
+          </ul>
+        </article>
+        <article class="card reveal d3">
+          <div class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14.5 6.5a4 4 0 0 0 5.2 5.2l-8.4 8.4a2.6 2.6 0 0 1-3.7-3.7l8.4-8.4a4 4 0 0 1-1.5-1.5Z"/><path d="m4 20 2-2"/></svg></div>
+          <h3>Доработка и правки</h3>
+          <p>Есть готовый сайт или бот, но что-то сломалось или не хватает функции — разберусь в чужом коде и доведу до результата.</p>
+          <ul>
+            <li>Исправление багов и ошибок вёрстки</li>
+            <li>Добавление новых блоков и функций</li>
+            <li>Ускорение загрузки и чистка кода</li>
+          </ul>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <section class="section" id="projects">
+    <div class="wrap">
+      <div class="sec-head row reveal">
+        <div>
+          <div class="eyebrow">Проекты</div>
+          <h2>Работы, которые можно открыть</h2>
+          <p>Код открыт на GitHub — можно посмотреть структуру и подход к разработке.</p>
+        </div>
+        <a class="btn btn-ghost btn-sm" href="https://github.com/viskarev2010-zxc?tab=repositories" target="_blank" rel="noopener">
+          Все репозитории
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 17 17 7M9 7h8v8"/></svg>
+        </a>
+      </div>
+      <div class="grid g3">
+        <a class="card project reveal" href="https://github.com/viskarev2010-zxc/Rasxod-TGBot-RU-" target="_blank" rel="noopener">
+          <div class="project-top">
+            <div class="project-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m21.5 3.5-9 17-3.2-7.3L2 10.2l19.5-6.7Z"/></svg></div>
+            <span class="arrow"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17 17 7M9 7h8v8"/></svg></span>
+          </div>
+          <h3>Telegram-бот учёта расходов</h3>
+          <p>Бот принимает траты сообщением, раскладывает по категориям и показывает статистику за период.</p>
+          <div class="tags"><span class="tag p">Python</span><span class="tag">aiogram</span><span class="tag">SQLite</span></div>
+        </a>
+        <a class="card project reveal d1" href="https://github.com/viskarev2010-zxc/Parser-Prices-RU-" target="_blank" rel="noopener">
+          <div class="project-top">
+            <div class="project-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><ellipse cx="12" cy="5" rx="8.5" ry="3.2"/><path d="M3.5 5v7c0 1.8 3.8 3.2 8.5 3.2s8.5-1.4 8.5-3.2V5"/><path d="M3.5 12v7c0 1.8 3.8 3.2 8.5 3.2s8.5-1.4 8.5-3.2v-7"/></svg></div>
+            <span class="arrow"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17 17 7M9 7h8v8"/></svg></span>
+          </div>
+          <h3>Парсер цен и товаров</h3>
+          <p>Собирает цены с сайтов, сохраняет в базу и отдаёт результат для мониторинга и анализа.</p>
+          <div class="tags"><span class="tag p">Python</span><span class="tag">requests</span><span class="tag">BeautifulSoup</span></div>
+        </a>
+        <a class="card project reveal d2" href="https://github.com/viskarev2010-zxc/AsyncDo-RU-" target="_blank" rel="noopener">
+          <div class="project-top">
+            <div class="project-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 11.5 11.5 14 16 9"/><rect x="3" y="4" width="18" height="17" rx="3"/><path d="M8 2v4M16 2v4"/></svg></div>
+            <span class="arrow"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17 17 7M9 7h8v8"/></svg></span>
+          </div>
+          <h3>Веб-приложение для задач</h3>
+          <p>Асинхронный таск-менеджер: интерфейс на JavaScript, серверная часть на Python.</p>
+          <div class="tags"><span class="tag j">JavaScript</span><span class="tag p">Python</span><span class="tag">REST API</span></div>
+        </a>
+        <a class="card project reveal" href="https://github.com/viskarev2010-zxc/TexnoService-RU-" target="_blank" rel="noopener">
+          <div class="project-top">
+            <div class="project-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="2" y="3" width="20" height="14" rx="2.5"/><path d="M8 21h8M12 17v4"/></svg></div>
+            <span class="arrow"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17 17 7M9 7h8v8"/></svg></span>
+          </div>
+          <h3>Сайт сервисного центра</h3>
+          <p>Адаптивный лендинг с услугами, ценами и блоком заявки для клиентов.</p>
+          <div class="tags"><span class="tag">HTML</span><span class="tag">CSS</span><span class="tag j">JavaScript</span></div>
+        </a>
+        <a class="card project reveal d1" href="https://github.com/viskarev2010-zxc/Beauty-salon-RU-" target="_blank" rel="noopener">
+          <div class="project-top">
+            <div class="project-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3v18M3 12h18"/><circle cx="12" cy="12" r="9"/></svg></div>
+            <span class="arrow"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17 17 7M9 7h8v8"/></svg></span>
+          </div>
+          <h3>Сайт салона красоты</h3>
+          <p>Лендинг с прайсом, галереей работ и записью на услугу.</p>
+          <div class="tags"><span class="tag">HTML</span><span class="tag">CSS</span><span class="tag j">JavaScript</span></div>
+        </a>
+        <div class="card reveal d2" style="display:flex;flex-direction:column;justify-content:center;background:linear-gradient(150deg,rgba(124,92,255,.14),rgba(34,211,238,.06));">
+          <h3 style="margin-bottom:8px">Ваш проект может быть здесь</h3>
+          <p style="margin-bottom:20px">Расскажите задачу — предложу решение и честно скажу по срокам.</p>
+          <a class="btn btn-primary btn-sm" href="https://t.me/haunted8" target="_blank" rel="noopener" style="align-self:flex-start">Написать в Telegram</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section" id="about">
+    <div class="wrap about">
+      <div class="reveal">
+        <div class="eyebrow">Обо мне</div>
+        <h2 style="font-size:clamp(1.9rem,3.4vw,2.7rem);margin-bottom:22px">Код, который<br>не стыдно показать</h2>
+        <p>
+          Занимаюсь веб-разработкой и Python. Начинал с вёрстки лендингов, сейчас
+          делаю и сайты, и Telegram-ботов, и парсеры — часто в одном проекте.
+        </p>
+        <p>
+          Мне важно, чтобы после сдачи всё работало без меня: оставляю инструкцию
+          по запуску, понятные комментарии в коде и остаюсь на связи, если появятся вопросы.
+        </p>
+        <div class="stack">
+          <span>HTML5</span><span>CSS3</span><span>JavaScript</span><span>Python</span>
+          <span>aiogram</span><span>Telegram Bot API</span><span>requests</span><span>BeautifulSoup</span>
+          <span>SQLite</span><span>REST API</span><span>Git / GitHub</span><span>Адаптивная вёрстка</span>
+        </div>
+      </div>
+      <div class="principles reveal d1">
+        <div class="principle"><span class="num">01</span><div><b>Сроки — это обещание</b><span>Оцениваю реалистично и предупреждаю заранее, если что-то меняется.</span></div></div>
+        <div class="principle"><span class="num">02</span><div><b>Промежуточные показы</b><span>Вы видите результат до финала и можете скорректировать курс.</span></div></div>
+        <div class="principle"><span class="num">03</span><div><b>Понятный код</b><span>Без лишних библиотек и «магии» — проект легко передать другому разработчику.</span></div></div>
+        <div class="principle"><span class="num">04</span><div><b>Поддержка после сдачи</b><span>Помогаю с запуском и отвечаю на вопросы, когда проект уже работает.</span></div></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section" id="process" style="padding-top:0">
+    <div class="wrap">
+      <div class="sec-head reveal">
+        <div class="eyebrow">Как работаю</div>
+        <h2>Четыре шага до результата</h2>
+      </div>
+      <div class="steps">
+        <div class="step reveal"><h3>Обсуждаем задачу</h3><p>Пишете в Telegram, что нужно сделать и для кого. Задаю вопросы, чтобы не угадывать.</p></div>
+        <div class="step reveal d1"><h3>Оценка и сроки</h3><p>Предлагаю решение, называю стоимость и срок. Фиксируем объём работ.</p></div>
+        <div class="step reveal d2"><h3>Делаю и показываю</h3><p>Работаю по этапам, показываю промежуточный результат и вношу правки.</p></div>
+        <div class="step reveal d3"><h3>Сдача и поддержка</h3><p>Передаю готовый проект с инструкцией и остаюсь на связи после запуска.</p></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section" id="contacts" style="padding-top:0">
+    <div class="wrap">
+      <div class="cta reveal">
+        <div>
+          <div class="eyebrow" style="margin-bottom:14px">Контакты</div>
+          <h2>Расскажите, что нужно сделать</h2>
+          <p>Отвечу, задам пару вопросов и скажу, сколько это займёт. Обычно — в течение дня.</p>
+        </div>
+        <div class="cta-actions">
+          <a class="btn btn-primary" href="https://t.me/haunted8" target="_blank" rel="noopener">
+            <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M21.9 4.3 18.9 19c-.2 1-.8 1.3-1.7.8l-4.6-3.4-2.2 2.1c-.2.2-.4.4-.9.4l.3-4.6 8.4-7.6c.4-.3-.1-.5-.6-.2L7.2 13.1l-4.5-1.4c-1-.3-1-1 .2-1.5L20.5 2.9c.8-.3 1.6.2 1.4 1.4Z"/></svg>
+            Telegram · @haunted8
+          </a>
+          <a class="btn btn-ghost" href="https://kwork.ru/user/visk1111" target="_blank" rel="noopener">Профиль на Kwork</a>
+          <span class="cta-note">Отвечаю в течение дня · консультация бесплатно</span>
+        </div>
+      </div>
+
+      <div class="grid g3" style="margin-top:18px">
+        <a class="card contact-card reveal" href="https://t.me/haunted8" target="_blank" rel="noopener">
+          <div class="ico"><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M21.9 4.3 18.9 19c-.2 1-.8 1.3-1.7.8l-4.6-3.4-2.2 2.1c-.2.2-.4.4-.9.4l.3-4.6 8.4-7.6c.4-.3-.1-.5-.6-.2L7.2 13.1l-4.5-1.4c-1-.3-1-1 .2-1.5L20.5 2.9c.8-.3 1.6.2 1.4 1.4Z"/></svg></div>
+          <div><b>Telegram</b><span>@haunted8 · быстрее всего</span></div>
+          <span class="arrow"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17 17 7M9 7h8v8"/></svg></span>
+        </a>
+        <a class="card contact-card reveal d1" href="https://github.com/viskarev2010-zxc" target="_blank" rel="noopener">
+          <div class="ico"><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2C6.5 2 2 6.6 2 12.2c0 4.5 2.9 8.3 6.8 9.7.5.1.7-.2.7-.5v-1.8c-2.8.6-3.4-1.2-3.4-1.2-.4-1.2-1.1-1.5-1.1-1.5-.9-.6.1-.6.1-.6 1 .1 1.5 1 1.5 1 .9 1.6 2.4 1.1 3 .9.1-.7.4-1.1.6-1.4-2.2-.3-4.6-1.1-4.6-5 0-1.1.4-2 1-2.7-.1-.3-.4-1.3.1-2.7 0 0 .8-.3 2.7 1a9.3 9.3 0 0 1 5 0c1.9-1.3 2.7-1 2.7-1 .5 1.4.2 2.4.1 2.7.6.7 1 1.6 1 2.7 0 3.9-2.3 4.7-4.6 5 .4.3.7.9.7 1.9v2.8c0 .3.2.6.7.5a10.2 10.2 0 0 0 6.8-9.7C22 6.6 17.5 2 12 2Z"/></svg></div>
+          <div><b>GitHub</b><span>viskarev2010-zxc</span></div>
+          <span class="arrow"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17 17 7M9 7h8v8"/></svg></span>
+        </a>
+        <a class="card contact-card reveal d2" href="https://kwork.ru/user/visk1111" target="_blank" rel="noopener">
+          <div class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 8h16l-1.5 12h-13L4 8Z"/><path d="M9 8V6a3 3 0 0 1 6 0v2"/></svg></div>
+          <div><b>Kwork</b><span>Заказ и оплата через сервис</span></div>
+          <span class="arrow"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17 17 7M9 7h8v8"/></svg></span>
+        </a>
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer>
+  <div class="wrap foot">
+    <div>© <span id="year">2026</span> Александр · сайты, боты и автоматизация</div>
+    <div class="foot-links">
+      <a href="https://t.me/haunted8" target="_blank" rel="noopener">Telegram</a>
+      <a href="https://github.com/viskarev2010-zxc" target="_blank" rel="noopener">GitHub</a>
+      <a href="https://kwork.ru/user/visk1111" target="_blank" rel="noopener">Kwork</a>
+    </div>
+  </div>
+</footer>
+
+<script>
+  // год
+  document.getElementById('year').textContent = new Date().getFullYear();
+
+  // шапка + прогресс
+  const header = document.getElementById('header');
+  const progress = document.getElementById('progress');
+  const onScroll = () => {
+    const y = window.scrollY;
+    header.classList.toggle('scrolled', y > 20);
+    const h = document.documentElement.scrollHeight - window.innerHeight;
+    progress.style.width = (h > 0 ? (y / h) * 100 : 0) + '%';
+  };
+  window.addEventListener('scroll', onScroll, { passive: true });
+  onScroll();
+
+  // мобильное меню
+  const burger = document.getElementById('burger');
+  const navLinks = document.getElementById('navLinks');
+  burger.addEventListener('click', () => {
+    const open = navLinks.classList.toggle('open');
+    burger.classList.toggle('open', open);
+    burger.setAttribute('aria-expanded', String(open));
+  });
+  navLinks.querySelectorAll('a').forEach(a => a.addEventListener('click', () => {
+    navLinks.classList.remove('open');
+    burger.classList.remove('open');
+    burger.setAttribute('aria-expanded', 'false');
+  }));
+
+  // появление блоков
+  const items = document.querySelectorAll('.reveal');
+  const revealVisible = () => {
+    items.forEach(el => {
+      const r = el.getBoundingClientRect();
+      if (r.top < window.innerHeight * 1.15 && r.bottom > -40) el.classList.add('in');
+    });
+  };
+  if ('IntersectionObserver' in window) {
+    const io = new IntersectionObserver((entries) => {
+      entries.forEach(e => {
+        if (e.isIntersecting) { e.target.classList.add('in'); io.unobserve(e.target); }
+      });
+    }, { threshold: 0.12, rootMargin: '0px 0px -40px 0px' });
+    items.forEach(el => io.observe(el));
+    // страховка для фоновых вкладок и старых браузеров
+    setTimeout(revealVisible, 900);
+    window.addEventListener('load', revealVisible);
+  } else {
+    items.forEach(el => el.classList.add('in'));
+  }
+
+  // подсветка карточек под курсором
+  document.querySelectorAll('.card').forEach(card => {
+    card.addEventListener('pointermove', (e) => {
+      const r = card.getBoundingClientRect();
+      card.style.setProperty('--mx', (e.clientX - r.left) + 'px');
+      card.style.setProperty('--my', (e.clientY - r.top) + 'px');
+    });
+  });
+</script>
+</body>
+</html>
